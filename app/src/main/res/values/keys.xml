@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="parse_app_id">BUTYl1vw2r8vKCWXgQaeDY8BfEqZecVjD7nFz4Le</string>
-    <string name="parse_client_key">XgQaeDY8BfEqZecVjD7nFz4LeBUTYl1vw2r8vKCW</string>
-    <string name="parse_server">https://lvs-parse-server.herokuapp.com/parse</string>
-</resources>
