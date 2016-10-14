@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Uber clone</string>
+    <string name="action_settings">Settings</string>
+</resources>
