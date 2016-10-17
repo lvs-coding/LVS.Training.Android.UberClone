@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Uber clone</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="map_fine_location_denied">Consider granting it in order to get the current location.</string>
+    <string name="map_fine_location_never_askagain">Dialog never shows again.\nPlease go setting and grant it if you want to.</string>
+    <string name="map_fine_location_rationale">Location permissions is needed to show your current position.</string>
+    <string name="map_button_allow">Allow</string>
+    <string name="map_button_deny">Deny</string>
 </resources>

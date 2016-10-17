@@ -1,5 +1,8 @@
 package com.lvsandroid.uberclone;
 
+import android.*;
+import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if(e == null) {
                     Log.i("DBG","user signed up");
+                    redirectUser();
                 } else {
                     Log.e("ERROR",e.toString());
                 }
@@ -41,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +75,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if(ParseUser.getCurrentUser().get("riderOrDriver") != null) {
                 Log.i("DBG","Redirect user");
+                redirectUser();
             }
+        }
+    }
+
+    private void redirectUser() {
+        if(ParseUser.getCurrentUser().get("riderOrDriver").equals("rider")) {
+            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+            startActivity(i);
         }
     }
 
