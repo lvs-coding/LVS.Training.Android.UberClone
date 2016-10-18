@@ -8,4 +8,6 @@
     <string name="map_fine_location_rationale">Location permissions is needed to show your current position.</string>
     <string name="map_button_allow">Allow</string>
     <string name="map_button_deny">Deny</string>
+
+    <string name="msg_finding_uber">Finding Uber driver...</string>
 </resources>

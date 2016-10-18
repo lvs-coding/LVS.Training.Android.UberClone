@@ -10,11 +10,15 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +27,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.ParseACL;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -33,12 +45,68 @@ import permissions.dispatcher.RuntimePermissions;
 
 import android.Manifest;
 
+import java.util.List;
+
 @RuntimePermissions
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Double latitude = 0d;
     private Double longitude = 0d;
+    private TextView infoTextView;
+    private FloatingActionButton fabRequestUber;
+
+    private Boolean requestActive = false;
+
+    private void requestUber() {
+        if(!requestActive) {
+            Log.i("DBG", "Uber requested");
+
+            ParseObject request = new ParseObject("Requests");
+            request.put("requesterUsername", ParseUser.getCurrentUser().getUsername());
+
+            ParseACL parseACL = new ParseACL();
+            parseACL.setPublicWriteAccess(true);
+            parseACL.setPublicReadAccess(true);
+            request.setACL(parseACL);
+
+            request.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        infoTextView.setText(getResources().getString(R.string.msg_finding_uber));
+                        fabRequestUber.setImageResource(R.drawable.ic_car_redcross);
+                        requestActive = true;
+                    }
+                }
+            });
+        } else {
+            ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Requests");
+            query.whereEqualTo("requesterUsername",ParseUser.getCurrentUser().getUsername());
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
+                    if(e == null) {
+                        if(objects.size() > 0) {
+                            for (ParseObject object:objects) {
+                                object.deleteInBackground(new DeleteCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if(e == null) {
+                                            Log.i("DBG","Request deleted");
+                                            infoTextView.setText("Uber cancelled");
+                                            fabRequestUber.setImageResource(R.drawable.ic_car);
+                                            requestActive = false;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
 
     @NeedsPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
     void getLocation() {
@@ -75,7 +143,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
             };
-
 
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 1000, 10, locationListener);
@@ -125,7 +192,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        infoTextView = (TextView)findViewById(R.id.infoTextView);
 
+        fabRequestUber = (FloatingActionButton) findViewById(R.id.requestUber);
+        fabRequestUber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestUber();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+            }
+        });
     }
 
     @Override
@@ -146,8 +223,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i("Position Latitude", String.valueOf(latitude));
             Log.i("Position Longitude", String.valueOf(longitude));
 
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition,10));
             mMap.addMarker(new MarkerOptions().position(currentPosition).title("Your location"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
         }
 
     }
