@@ -2,6 +2,7 @@ package com.lvsandroid.uberclone;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -9,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +23,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,12 +60,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double longitude = 0d;
     private TextView infoTextView;
     private FloatingActionButton fabRequestUber;
+    private FloatingActionButton fabLogout;
 
     private Boolean requestActive = false;
 
     private void requestUber() {
         if(!requestActive) {
             Log.i("DBG", "Uber requested");
+
 
             ParseObject request = new ParseObject("Requests");
             request.put("requesterUsername", ParseUser.getCurrentUser().getUsername());
@@ -115,8 +122,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else {
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);
-
-
 
             LocationListener locationListener = new LocationListener() {
 
@@ -199,10 +204,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 requestUber();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
+
+        fabLogout = (FloatingActionButton) findViewById(R.id.logout);
+        fabLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ParseUser.getCurrentUser().logOut();
+                Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(i);
+            }
+        });
+
+    }
+
+    protected void onStart() {
+        super.onStart();
+        getLocation();
     }
 
     @Override

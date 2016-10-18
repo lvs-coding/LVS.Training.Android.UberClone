@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         if(ParseUser.getCurrentUser().get("riderOrDriver").equals("rider")) {
             Intent i = new Intent(getApplicationContext(),MapsActivity.class);
             startActivity(i);
+        } else {
+            Log.i("DBG","Go to request screen");
         }
     }
 
