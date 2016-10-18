@@ -39,7 +39,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Double latitude = 0d;
     private Double longitude = 0d;
-    private String provider;
 
     @NeedsPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
     void getLocation() {
@@ -141,7 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setMapLocation(double latitude, double longitude) {
         if(latitude != 0 && longitude != 0) {
 
-
+            mMap.clear();
             // Add a marker in Sydney and move the camera
             LatLng currentPosition = new LatLng(latitude, longitude);
             Log.i("Position Latitude", String.valueOf(latitude));
